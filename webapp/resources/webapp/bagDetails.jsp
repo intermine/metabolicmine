@@ -9,12 +9,17 @@
 
 <!-- bagDetails.jsp -->
 
-<html:xhtml/>
-
 <div class="body">
 
 <c:choose>
 <c:when test="${!empty bag}">
+
+<script type="text/javascript">
+  <%-- the number of entries to show in References & Collections before switching to "show all" --%>
+  var numberOfTableRowsToShow = '${object.numberOfTableRowsToShow}'; <%-- required on report.js --%>
+  numberOfTableRowsToShow = (numberOfTableRowsToShow == '') ? 30 : parseInt(numberOfTableRowsToShow);
+</script>
+<script type="text/javascript" src="js/report.js"></script>
 
 <script type="text/javascript">
 <!--//<![CDATA[
@@ -112,7 +117,7 @@
     <%-- meta --%>
     <table class="fields">
       <tr>
-        <td class="nobr slim">Results: ${bag.size} ${bag.type}<c:if test="${bag.size != 1}">s</c:if></td>
+        <td class="nobr slim">Results: ${bag.size}&nbsp;${bag.type}<c:if test="${bag.size != 1}">s</c:if></td>
         <td class="nobr slim">Created: <fmt:formatDate dateStyle="full" timeStyle="full" value="${bag.dateCreated}" /></td>
         <td class="description">
           Description:
@@ -239,8 +244,8 @@
 
     <div id="ListCategory" class="aspectBlock">
     <div class="box grid_4">
-        <a name="list"><h2>List of ${bag.size} ${bag.type}<c:if test="${bag.size != 1}">s</c:if>
-        <div class="button">
+        <a name="list"><h2>List of ${bag.size}&nbsp;${bag.type}<c:if test="${bag.size != 1}">s</c:if>&nbsp;<div
+        class="button">
             <div class="left"></div>
             <input type="button" value="+ Show">
             <div class="right"></div>
@@ -457,25 +462,25 @@
     </div>
     </c:forEach>
 
+    </div>
+
     <div class="clear"></div>
 
     <div id="TemplatesCategory" class="aspectBlock">
     <div class="box grid_12">
-        <a name="templates"><h2>Templates</h2></a>
-    </div>
+        <a name="templates"><h2>Template results for '${bag.name}'</h2></a>
 
-    <%-- templates --%>
-    <div class="box grid_12">
-      <div class="feature theme-1-border">
-        <c:set var="templateIdPrefix" value="bagDetailsTemplate${bag.type}"/>
-        <c:set value="${fn:length(CATEGORIES)}" var="aspectCount"/>
-        <h3>Template results for '${bag.name}' <span>(<a href="javascript:toggleAll(${aspectCount}, '${templateIdPrefix}', 'expand', null, true);">expand all <img src="images/disclosed.gif"/></a> / <a href="javascript:toggleAll(${aspectCount}, '${templateIdPrefix}', 'collapse', null, true);">collapse all <img src="images/undisclosed.gif"/></a>)</span></h3>
-        <fmt:message key="bagDetails.templatesHelp">
-            <fmt:param><img src="images/disclosed.gif"/> / <img src="images/undisclosed.gif"/></fmt:param>
-        </fmt:message>
-      </div>
+        <%-- Each aspect --%>
+        <c:forEach items="${CATEGORIES}" var="aspect" varStatus="status">
+          <tiles:insert name="reportAspect.tile">
+            <tiles:put name="placement" value="im:aspect:${aspect}"/>
+            <tiles:put name="trail" value="|bag.${bag.name}"/>
+            <tiles:put name="interMineIdBag" beanName="bag"/>
+            <tiles:put name="aspectId" value="${templateIdPrefix}${status.index}" />
+            <tiles:put name="opened" value="${status.index == 0}" />
+          </tiles:insert>
+        </c:forEach>
     </div>
-
     </div>
 
   </div>
